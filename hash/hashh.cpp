@@ -1,17 +1,19 @@
 #include <iostream>
-#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
+#include <vector>
+#include <string>
 #include <crypto++/cryptlib.h>
 #include <crypto++/hex.h>
 #include <crypto++/files.h>
-#include <crypto++/md5.h>
-#include <string>
-using namespace std;
-using namespace CryptoPP;
+#include <crypto++/sha.h>
 int main(int argc, char **argv)
 {
-    string Hash;
-    Weak::MD5 hash;
-    FileSource("text.txt", true, new HashFilter(hash, new HexEncoder(new StringSink (Hash))));
-    cout<<Hash<<endl;
+    using namespace CryptoPP;
+    SHA1 hash;
+    std::string msg = "Hello, world";
+    std::vector<byte> digest(hash.DigestSize());
+    hash.Update((const byte*)msg.data(),msg.size());
+    hash.Final(digest.data());
+    StringSource(digest.data(), digest.size(), true, new HexEncoder(new FileSink(std::cout)));
+    std::cout<<std::endl;
     return 0;
 }
